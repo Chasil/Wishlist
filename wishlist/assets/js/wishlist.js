@@ -10,6 +10,9 @@ jQuery(function ($) {
                 productId: productId,
                 action: 'addtowishlist'
             },
+            success: function(response) {
+                console.log(response);
+            }
         });
     });
 });

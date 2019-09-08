@@ -49,7 +49,51 @@ class Wishlist {
      * @param int - product ID
      */
     public function addToWishlist($productId) {
-        $productId = $_POST['productId'];
+        $productID = $_POST['productId'];
+
+        $cookieData = array();
+        $itemsLimit = 5;
+
+        if(isset($_COOKIE['WishList'])) {
+
+            $cookieData = json_decode(html_entity_decode(stripslashes($_COOKIE['WishList'])), true);
+            $currentItemsAmount = sizeof();
+
+            if($currentItemsAmount < $itemsLimit) {
+                if(!in_array($productID, $cookieData)) {
+                    array_push($cookieData, $productID);
+                } else {
+                    var_dump('istnieje');
+                }
+            } else {
+                echo json_decode(
+                    array(
+                        'status' => false,
+                        'itemsLimit' => $itemsLimit
+                    ));
+                die();
+            }
+
+        } else {
+            $cookieData = $productID;
+        }
+
+        var_dump($cookieData);
+
+        setcookie('WishList', json_encode($cookieData), time() + 96422400, '/', 'wishlist.pandzia.pl');
+
+        echo json_encode(array('ststus' => true));
+        die();
+    }
+
+    /*
+     * Set cookies
+     */
+    public function setMyCookies($productID) {
+
+        var_dump(1212);
+
+
     }
 
     public function frontScripts() {
