@@ -66,3 +66,16 @@
     /*from { opacity: 1; }*/
     /*to { opacity: 0; }*/
 /*}*/
+
+/*
+ * Wishlist page
+ */
+
+.wishlist-page {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.wishlist-page .wishlist-sp {
+    margin-right: 50px;
+}

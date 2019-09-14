@@ -30,8 +30,9 @@ class Wishlist {
         add_filter( 'wp_nav_menu', array($this, 'createMenuIcon') );
         add_action( 'woocommerce_before_single_product_summary', array($this, 'createProductWishlistButton') );
         add_action( 'woocommerce_after_single_product', array($this, 'setStatements') );
-        add_action( 'wp_ajax_addtowishlist', array($this, 'setCookies') );
+        add_action( 'wp_ajax_addtowishlist', array($this, 'setCookie') );
         add_action( 'wp_ajax_nopriv_addtowishlist', array($this, 'setCookie') );
+        add_shortcode( 'wishlist', array($this, 'displayWishlist') );
     }
 
     public function createMenuIcon($nav_menu) {
@@ -48,17 +49,17 @@ class Wishlist {
     public function setCookie() {
 
         $productID = $_POST['productId'];
-        $itemsLimit = 1;
-        $cookieData = array();
+        $itemsLimit = 4;
+        $cookieProducts = array();
 
         if(isset($_COOKIE['WishList'])) {
 
-            $cookieData = json_decode(html_entity_decode(stripslashes($_COOKIE['WishList'])), true);
-            $currentItemsAmount = sizeof($cookieData);
+            $cookieProducts = json_decode(html_entity_decode(stripslashes($_COOKIE['WishList'])), true);
+            $currentItemsAmount = sizeof($cookieProducts);
 
             if($currentItemsAmount < $itemsLimit) {
-                if(!in_array($productID, $cookieData)) {
-                    $cookieData[] = $productID;
+                if(!in_array($productID, $cookieProducts)) {
+                    $cookieProducts[] = $productID;
                 } else {
                     echo json_encode(
                         array(
@@ -76,10 +77,10 @@ class Wishlist {
                 die();
             }
         } else {
-            $cookieData[] = $productID;
+            $cookieProducts[] = $productID;
         }
 
-        setcookie('WishList', json_encode($cookieData), time() + 96422400, '/', 'wishlist.pandzia.pl');
+        setcookie('WishList', json_encode($cookieProducts), time() + 96422400, '/', 'wishlist.pandzia.pl');
 
         echo json_encode(array('status' => 'added'));
         die();
@@ -87,6 +88,26 @@ class Wishlist {
 
     public function setStatements() {
         require(dirname(__FILE__ ) . '/views/statements.php');
+    }
+
+    public function displayWishlist() {
+
+        if(isset($_COOKIE['WishList'])) {
+            $cookieProducts = json_decode(html_entity_decode(stripslashes($_COOKIE['WishList'])), true);
+
+            $products = array();
+            foreach($cookieProducts as $product => $productId) {
+                $product = wc_get_product($productId);
+                $products[] = array(
+                    'id' => $product->get_id(),
+                    'name' => $product->get_name(),
+                    'image' => get_the_post_thumbnail_url($productId, 'medium'),
+                    'link' => get_permalink($productId)
+                );
+            }
+        }
+
+        require(dirname(__FILE__) . '/views/wishlist.php');
     }
 
     public function addFrontScripts() {
