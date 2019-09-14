@@ -32,6 +32,8 @@ class Wishlist {
         add_action( 'woocommerce_after_single_product', array($this, 'setStatements') );
         add_action( 'wp_ajax_addtowishlist', array($this, 'setCookie') );
         add_action( 'wp_ajax_nopriv_addtowishlist', array($this, 'setCookie') );
+        add_action( 'wp_ajax_removefromwishlist', array($this, 'removeFromWishlist') );
+        add_action( 'wp_ajax_nopriv_removefromwishlist', array($this, 'removeFromWishlist') );
         add_shortcode( 'wishlist', array($this, 'displayWishlist') );
     }
 
@@ -59,7 +61,7 @@ class Wishlist {
 
             if($currentItemsAmount < $itemsLimit) {
                 if(!in_array($productID, $cookieProducts)) {
-                    $cookieProducts[] = $productID;
+                    $cookieProducts[$productID] = $productID;
                 } else {
                     echo json_encode(
                         array(
@@ -77,7 +79,7 @@ class Wishlist {
                 die();
             }
         } else {
-            $cookieProducts[] = $productID;
+            $cookieProducts[$productID] = $productID;
         }
 
         setcookie('WishList', json_encode($cookieProducts), time() + 96422400, '/', 'wishlist.pandzia.pl');
@@ -108,6 +110,21 @@ class Wishlist {
         }
 
         require(dirname(__FILE__) . '/views/wishlist.php');
+    }
+
+    public function removeFromWishlist() {
+
+        $productId = $_POST['productId'];
+
+        if(isset($_COOKIE['WishList'])) {
+            $cookieProducts = json_decode(html_entity_decode(stripslashes($_COOKIE['WishList'])), true);
+
+            if(in_array($productId, $cookieProducts)) {
+                unset($cookieProducts[$productId]);
+            }
+        }
+
+        setcookie('WishList', json_encode($cookieProducts), time() + 96422400, '/', 'wishlist.pandzia.pl');
     }
 
     public function addFrontScripts() {

@@ -79,3 +79,7 @@
 .wishlist-page .wishlist-sp {
     margin-right: 50px;
 }
+
+.wishlist-remove {
+    cursor: pointer;
+}

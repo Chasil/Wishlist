@@ -13,5 +13,7 @@
                 </div>
             </div>
         <?php endforeach; ?>
+    <?php else: ?>
+    <div>Brak produktów w schowku</div>
     <?php endif; ?>
 </div>
