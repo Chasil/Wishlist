@@ -1,5 +1,12 @@
 jQuery(function ($) {
+
+    $('.overlay').on('click', function() {
+        $(this).removeClass('wishlist-show');
+    });
+
     $('.add-to-wishlist').on('click', function() {
+
+        $('#wishlist-adding').addClass('wishlist-show');
 
         var productId = $(this).data('id');
         $.ajax({
@@ -11,7 +18,14 @@ jQuery(function ($) {
                 action: 'addtowishlist'
             },
             success: function(response) {
-                console.log(response);
+                $('#wishlist-adding').removeClass("wishlist-show");
+                if(response.status === 'added') {
+                    $('#wishlist-added').addClass("wishlist-show");
+                } else if(response.status === 'alreadyExists') {
+                    $('#wishlist-already-exists').addClass("wishlist-show");
+                } else if(response.status === 'limitReached') {
+                    $('#wishlist-limit-reached').addClass("wishlist-show");
+                }
             }
         });
     });
